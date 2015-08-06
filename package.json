@@ -6,12 +6,21 @@
   "scripts": {
     "test": ""
   },
-  "keywords":[
+  "keywords": [
     "cache"
   ],
   "author": "xialeistudio <1065890063@qq.com>",
   "license": "MIT",
   "dependencies": {
     "crypto": "0.0.3"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xialeistudio/xl-cache.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xialeistudio/xl-cache/issues"
+  },
+  "homepage": "https://github.com/xialeistudio/xl-cache"
 }
