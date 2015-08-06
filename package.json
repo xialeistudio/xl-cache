@@ -1,0 +1,17 @@
+{
+  "name": "xl-cache",
+  "version": "1.0.0",
+  "description": "a cache module based on fileSystem",
+  "main": "index.js",
+  "scripts": {
+    "test": ""
+  },
+  "keywords":[
+    "cache"
+  ],
+  "author": "xialeistudio <1065890063@qq.com>",
+  "license": "MIT",
+  "dependencies": {
+    "crypto": "0.0.3"
+  }
+}
