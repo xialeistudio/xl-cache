@@ -52,12 +52,13 @@ var _get = function(key, callback) {
 	var filename = cachePath + '/' + tools.md5(key);
 	if (!fs.existsSync(filename)) {
 		typeof callback == 'function' && callback(null, false);
+		return;
 	}
 	fs.readFile(filename, 'UTF-8', function(err, data) {
 		data = JSON.parse(data);
 		//检测过期
 		if (data.expires_in > 0 && data.expires_in < new Date().getTime()) {
-			typeof callback == 'function' && callback(err, null)
+			typeof callback == 'function' && callback(err, null);
 		}
 		else {
 			typeof callback == 'function' && callback(err, data.value);
