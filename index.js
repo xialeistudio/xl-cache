@@ -3,6 +3,7 @@
  */
 var fs = require('fs');
 var tools = require('./tools');
+var Promise = require('bluebird');
 var cachePath = 'cache';
 /**
  * 初始化，检测缓存目录是否存在
@@ -23,46 +24,47 @@ init();
  * @param duration
  * @returns {*}
  * @private
- * @param callback
  */
-var _set = function(key, value, duration, callback) {
+var _set = function(key, value, duration) {
 	var filename = cachePath + '/' + tools.md5(key);
-	if (typeof duration == 'function') {
-		callback = duration;
-		duration = 0;
-	}
-	else {
-		duration = duration == 0 ? 0 : (new Date().getTime() + duration * 1000);
-	}
+	duration = duration == undefined ? 0 : (new Date().getTime() + duration * 1000);
 	var obj = {
 		key: key,
 		value: value,
 		expires_in: duration
 	};
-	fs.writeFile(filename, JSON.stringify(obj), 'UTF-8', callback);
+	return new Promise(function(resolve, reject) {
+		fs.writeFile(filename, JSON.stringify(obj), 'UTF-8', function(e) {
+			if (e) {
+				return reject(e);
+			}
+			return resolve();
+		});
+	});
 };
 /**
  * 获取缓存
  * @param key
  * @returns {*}
  * @private
- * @param callback
  */
-var _get = function(key, callback) {
+var _get = function(key) {
 	var filename = cachePath + '/' + tools.md5(key);
 	if (!fs.existsSync(filename)) {
-		typeof callback == 'function' && callback(null, false);
-		return;
+		return Promise.resolve(null);
 	}
-	fs.readFile(filename, 'UTF-8', function(err, data) {
-		data = JSON.parse(data);
-		//检测过期
-		if (data.expires_in > 0 && data.expires_in < new Date().getTime()) {
-			typeof callback == 'function' && callback(err, null);
-		}
-		else {
-			typeof callback == 'function' && callback(err, data.value);
-		}
+	return new Promise(function(resolve, reject) {
+		fs.readFile(filename, 'UTF-8', function(err, data) {
+			if (err) {
+				return reject(err);
+			}
+			data = JSON.parse(data);
+			//检测过期
+			if (data.expires_in > 0 && data.expires_in < new Date().getTime()) {
+				return resolve(null);
+			}
+			return resolve(data.value);
+		});
 	});
 };
 /**
@@ -70,28 +72,35 @@ var _get = function(key, callback) {
  * @param key
  * @returns {*}
  * @private
- * @param callback
  */
-var _remove = function(key, callback) {
+var _remove = function(key) {
 	var filename = cachePath + '/' + tools.md5(key);
-	fs.unlink(filename, callback)
+	return new Promise(function(resolve, reject) {
+		fs.unlink(filename, function(err) {
+			if (err) {
+				return reject(err);
+			}
+			return resolve();
+		})
+	});
 };
 /**
  * 清空缓存
  * @returns {*}
  * @private
  */
-var _clean = function(callback) {
-	fs.readdir(cachePath, function(err, list) {
-		if (err) {
-			throw err;
-		}
-		else {
-			list.forEach(function(item) {
-				var file = cachePath+'/'+item;
+var _clean = function() {
+	return new Promise(function(resolve, reject) {
+		fs.readdir(cachePath, function(err, list) {
+			if (err) {
+				return reject(err);
+			}
+			return resolve(Promise.map(list, function(item) {
+				var file = cachePath + '/' + item;
 				fs.unlink(file);
-			});
-		}
+				return Promise.resolve();
+			}));
+		});
 	});
 };
 module.exports = {
