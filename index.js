@@ -67,7 +67,8 @@ var _get = function(key) {
 				return resolve(data.value);
 			}
 			catch (e) {
-				console.error('[xl-cache] getCache->jsonParse: ' + e.message);
+				console.error('[xl-cache] getCache->jsonParse: ' + e.message + ', Promise will resolve(null)');
+				return resolve(null);
 			}
 		});
 	});
