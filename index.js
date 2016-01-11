@@ -58,12 +58,17 @@ var _get = function(key) {
 			if (err) {
 				return reject(err);
 			}
-			data = JSON.parse(data);
-			//检测过期
-			if (data.expires_in > 0 && data.expires_in < new Date().getTime()) {
-				return resolve(null);
+			try {
+				data = JSON.parse(data);
+				//检测过期
+				if (data.expires_in > 0 && data.expires_in < new Date().getTime()) {
+					return resolve(null);
+				}
+				return resolve(data.value);
 			}
-			return resolve(data.value);
+			catch (e) {
+				console.error('[xl-cache] getCache->jsonParse: ' + e.message);
+			}
 		});
 	});
 };
