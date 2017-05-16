@@ -1,4 +1,4 @@
-#xl-cache
+# xl-cache
 nodejs文件缓存模块
 ## 使用方法
 + 添加缓存 
@@ -37,7 +37,7 @@ cache.clean().then(function() {
 //清空失败
 });
 ```
-#单元测试
+# 单元测试
 ```
 npm run test
 ```
